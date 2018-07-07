@@ -1,0 +1,7 @@
+## Files and directories to ignore by git:
+
+# Vagrant Environment
+.vagrant/
+
+# Mac specifics
+.DS_Store
