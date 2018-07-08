@@ -1,8 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-
 Vagrant.configure(2) do |config|
 
   # Use SSH-Key of host machine
@@ -24,7 +22,7 @@ Vagrant.configure(2) do |config|
                     "--groups", "/Vagrant/LMU/Jenkins"
                    ]
     end
-    node.vm.network :public_network, ip: 192.168.5.100, netmask: "255.255.255.0"
+    node.vm.network :public_network, ip: "192.168.5.100", netmask: "255.255.255.0"
   end
 
   (1..10).each do |i|
