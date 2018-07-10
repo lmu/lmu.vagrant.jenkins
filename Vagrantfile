@@ -53,12 +53,12 @@ Vagrant.configure(2) do |config|
   end
   config.vm.provision "base-preseed", type: "ansible" do |ansible|
     ansible.compatibility_mode = "2.0"
-    ansible.playbook = "lmu.ansible.playbooks/base-preseed.yml"
+    ansible.playbook = "ansible/base-preseed.yml"
     #ansible.verbose = "vvv"
   end
   config.vm.provision "application", type: "ansible" do |ansible| # run: "never"
     ansible.compatibility_mode = "2.0"
-    ansible.playbook = "lmu.ansible.playbooks/jenkins.yml"
+    ansible.playbook = "ansible/jenkins.yml"
     ansible.groups = {
       "jenkinsmasters" => ["jenkinsmaster1",],
       "jenkinsslaves" => ["jenkinsslave1"],
