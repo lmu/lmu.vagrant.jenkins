@@ -9,6 +9,21 @@ Vagrant.configure(2) do |config|
   # Disable SharedFolder by default.
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
+  # General Provider Settings
+  config.vm.provider "virtualbox" do |vb|
+    # Disable GUI --> No GUI Window will pop up on start, could be opened on virtual Box app via double click on machine.
+    vb.gui = false
+
+    # special VirtualBox Customizations:
+    vb.customize ["modifyvm", :id,
+                  "--nicpromisc1", "allow-all",
+                  "--nicpromisc2", "allow-all",
+                  "--cpuexecutioncap", "50",
+                  # Make a Structure within Virtualbox to group Machines
+                  "--groups", "/Vagrant/LMU/Jenkins"
+                 ]
+  end
+
   config.vm.define "jenkinsmaster1", primary: true, autostart: true do |node|
     node.vm.box = "debian/stretch64"
     node.vm.hostname = "jenkinsmaster1"
@@ -17,10 +32,6 @@ Vagrant.configure(2) do |config|
       vb.name = "JenkinsMaster1"
       vb.memory = 8192
       vb.cpus = 8
-      vb.customize ["modifyvm", :id,
-                    "--cpuexecutioncap", "50",
-                    "--groups", "/Vagrant/LMU/Jenkins"
-                   ]
     end
     node.vm.network :public_network, ip: "192.168.5.100", netmask: "255.255.255.0"
   end
@@ -33,10 +44,6 @@ Vagrant.configure(2) do |config|
       node.vm.provider "virtualbox" do |vb|
         vb.memory = 2048
         vb.cpus = 2
-        vb.customize ["modifyvm", :id,
-                      "--cpuexecutioncap", "50",
-                      "--groups", "/Vagrant/LMU/Jenkins"
-                     ]
       end
       node.vm.network "private_network", ip: "192.168.5.#{110 + i}", netmask: "255.255.255.0"
     end
@@ -62,22 +69,22 @@ Vagrant.configure(2) do |config|
     ansible.groups = {
       "jenkinsmasters" => ["jenkinsmaster1",],
       "jenkinsslaves" => ["jenkinsslave1"],
-      }
-      #ansible.verbose = "vvvv"
-      ansible.verbose = "vvv"
-      #ansible.verbose = "vv"
-      #ansible.verbose = "v"
-      #ansible.verbose = ""
-      #ansible.start_at_task = ""
-      #ansible.stop_at_task = ""
-      #ansible.limit = "all"
-      #ansible.tags = ["setup", "configuration", "update"]
-      #ansible.skip_tags = ["update"]
-      ansible.extra_vars = {
-        ansible_connection: 'ssh',
-        ansible_ssh_args: '-o ForwardAgent=yes',
-        ansible_ssh_private_key_file: ['~/.ssh/id_rsa']
-      }
+    }
+    #ansible.verbose = "vvvv"
+    ansible.verbose = "vvv"
+    #ansible.verbose = "vv"
+    #ansible.verbose = "v"
+    #ansible.verbose = ""
+    #ansible.start_at_task = ""
+    #ansible.stop_at_task = ""
+    #ansible.limit = "all"
+    #ansible.tags = ["setup", "configuration", "update"]
+    #ansible.skip_tags = ["update"]
+    ansible.extra_vars = {
+      ansible_connection: 'ssh',
+      ansible_ssh_args: '-o ForwardAgent=yes',
+      ansible_ssh_private_key_file: ['~/.ssh/id_rsa']
+    }
   end
 
 end
