@@ -30,8 +30,8 @@ Vagrant.configure(2) do |config|
 
     node.vm.provider "virtualbox" do |vb|
       vb.name = "JenkinsMaster1"
-      vb.memory = 8192
-      vb.cpus = 8
+      vb.memory = 4096
+      vb.cpus = 4
     end
     node.vm.network :public_network, ip: "192.168.5.100", netmask: "255.255.255.0"
   end
