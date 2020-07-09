@@ -6,6 +6,9 @@ Vagrant.configure(2) do |config|
   # Use SSH-Key of host machine
   config.ssh.forward_agent = true
 
+  # Set Base Box and URL
+  config.vm.box = "generic/debian10"
+
   # Disable SharedFolder by default.
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -24,12 +27,11 @@ Vagrant.configure(2) do |config|
                  ]
   end
 
-  config.vm.define "jenkinsmaster1", primary: true, autostart: true do |node|
-    node.vm.box = "debian/stretch64"
-    node.vm.hostname = "jenkinsmaster1"
+  config.vm.define "jenkinscontroller1", primary: true, autostart: true do |node|
+    node.vm.hostname = "jenkinscontroller1"
 
     node.vm.provider "virtualbox" do |vb|
-      vb.name = "JenkinsMaster1"
+      vb.name = "JenkinsController1"
       vb.memory = 4096
       vb.cpus = 4
     end
@@ -37,9 +39,8 @@ Vagrant.configure(2) do |config|
   end
 
   (1..10).each do |i|
-    config.vm.define "jenkinsslave#{i}", primary: false, autostart: false do |node|
-      node.vm.box = "debian/stretch64"
-      node.vm.hostname = "jenkinsslave#{i}"
+    config.vm.define "jenkinsworker#{i}", primary: false, autostart: false do |node|
+      node.vm.hostname = "jenkinsworker#{i}"
 
       node.vm.provider "virtualbox" do |vb|
         vb.memory = 2048
@@ -65,25 +66,36 @@ Vagrant.configure(2) do |config|
   end
   config.vm.provision "application", type: "ansible" do |ansible| # run: "never"
     ansible.compatibility_mode = "2.0"
-    ansible.playbook = "ansible/jenkins.yml"
+    ansible.playbook = "ansible/base-preseed.yml"
+    #ansible.playbook = "ansible/jenkins.yml"
     ansible.groups = {
-      "jenkinsmasters" => ["jenkinsmaster1",],
-      "jenkinsslaves" => ["jenkinsslave1"],
+      "jenkinscontrollers" => ["jenkinscontroller1",],
+      "jenkinsworkers" => ["jenkinsworker1",
+                           "jenkinsworker2",
+                           "jenkinsworker3",
+                           "jenkinsworker4",
+                           "jenkinsworker5",
+                           "jenkinsworker6",
+                           "jenkinsworker7",
+                           "jenkinsworker8",
+                           "jenkinsworker9",
+                           "jenkinsworker10"],
     }
     #ansible.verbose = "vvvv"
-    ansible.verbose = "vvv"
+    #ansible.verbose = "vvvv"
     #ansible.verbose = "vv"
     #ansible.verbose = "v"
     #ansible.verbose = ""
     #ansible.start_at_task = ""
     #ansible.stop_at_task = ""
-    #ansible.limit = "all"
+    ansible.limit = "all"
     #ansible.tags = ["setup", "configuration", "update"]
     #ansible.skip_tags = ["update"]
     ansible.extra_vars = {
       ansible_connection: 'ssh',
       ansible_ssh_args: '-o ForwardAgent=yes',
-      ansible_ssh_private_key_file: ['~/.ssh/id_rsa']
+      ansible_ssh_private_key_file: ['~/.ssh/id_rsa'],
+      ansible_python_interpreter: "python3"
     }
   end
 
